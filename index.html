@@ -13,16 +13,35 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f2f5;
+            background-color: #f4f4f9;
         }
         .container {
             text-align: center;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .price-container {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4caf50;
+            margin: 20px 0;
+            border: 2px solid #4caf50;
+            padding: 10px;
+            border-radius: 10px;
+            background: #e8f5e9;
+        }
+        .timestamp {
+            font-size: 1em;
+            color: #666;
+            margin-top: 10px;
         }
         canvas {
             margin: 20px 0;
@@ -32,7 +51,7 @@
 <body>
     <div class="container">
         <h1>Dynamic Price Chart</h1>
-        <canvas id="priceChart" width="400" height="200"></canvas>
+        <canvas id="priceChart" width="600" height="300"></canvas>
         <div class="price-container">
             Current Price: $<span id="price">1.00</span>
         </div>
@@ -50,8 +69,8 @@
                 datasets: [{
                     label: 'Price',
                     data: [], // Price data
-                    borderColor: '#27ae60',
-                    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                    borderColor: '#4caf50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
                     borderWidth: 2,
                     fill: true,
                 }]
@@ -60,9 +79,14 @@
                 responsive: true,
                 scales: {
                     x: {
-                        type: 'time',
-                        time: {
-                            unit: 'second'
+                        type: 'realtime',
+                        realtime: {
+                            duration: 20000,
+                            refresh: 1000,
+                            delay: 2000,
+                            onRefresh: function(chart) {
+                                // Optional: code to execute when chart is refreshed
+                            }
                         },
                         title: {
                             display: true,
@@ -73,6 +97,18 @@
                         title: {
                             display: true,
                             text: 'Price ($)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Price: $${context.raw.toFixed(2)}`;
+                            }
                         }
                     }
                 }
@@ -107,8 +143,8 @@
             priceChart.data.labels.push(nowTime);
             priceChart.data.datasets[0].data.push(price);
 
-            // Keep the last 30 seconds of data
-            if (priceChart.data.labels.length > 30) {
+            // Keep the last 20 seconds of data
+            if (priceChart.data.labels.length > 20) {
                 priceChart.data.labels.shift();
                 priceChart.data.datasets[0].data.shift();
             }
