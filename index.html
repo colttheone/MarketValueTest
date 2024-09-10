@@ -4,12 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Price Chart</title>
-    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+        }
+        canvas {
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Price Fluctuation Chart</h1>
+        <h1>Dynamic Price Chart</h1>
         <canvas id="priceChart" width="400" height="200"></canvas>
         <div class="price-container">
             Current Price: $<span id="price">1.00</span>
@@ -18,6 +40,89 @@
             Last Updated: <span id="last-updated">Now</span>
         </div>
     </div>
-    <script src="price.js"></script>
+    <script>
+        // Initialize Chart.js
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        const priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Time data
+                datasets: [{
+                    label: 'Price',
+                    data: [], // Price data
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price ($)'
+                        }
+                    }
+                }
+            }
+        });
+
+        const PRICE_KEY = 'dynamicPrice';
+        const UPDATE_INTERVAL = 1000; // 1 second
+
+        function updatePrice() {
+            let price = parseFloat(localStorage.getItem(PRICE_KEY)) || 1.00;
+
+            // Generate a random change between -0.01 and +0.01
+            let change = (Math.random() * 0.02 * (Math.random() < 0.5 ? -1 : 1)).toFixed(2);
+            price = parseFloat(price) + parseFloat(change);
+
+            // Ensure the price doesn't drop below 0
+            price = Math.max(0.01, price).toFixed(2);
+
+            // Update localStorage with the new price
+            localStorage.setItem(PRICE_KEY, price);
+
+            // Update the price on the page
+            document.getElementById("price").innerText = price;
+
+            // Update the timestamp
+            let now = new Date().toLocaleTimeString();
+            document.getElementById("last-updated").innerText = now;
+
+            // Update chart data
+            let nowTime = new Date();
+            priceChart.data.labels.push(nowTime);
+            priceChart.data.datasets[0].data.push(price);
+
+            // Keep the last 30 seconds of data
+            if (priceChart.data.labels.length > 30) {
+                priceChart.data.labels.shift();
+                priceChart.data.datasets[0].data.shift();
+            }
+
+            priceChart.update();
+        }
+
+        // Initialize the chart on page load
+        window.onload = function() {
+            updatePrice(); // Initial update to set starting values
+
+            // Update the price every second
+            setInterval(updatePrice, UPDATE_INTERVAL);
+        }
+    </script>
 </body>
 </html>
