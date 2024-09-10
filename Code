@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Price Fluctuation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .price-container {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Price Fluctuation Test</h1>
+    <div class="price-container">
+        Current Price: $<span id="price">1.00</span>
+    </div>
+
+    <script>
+        let price = 1.00; // Initial price
+
+        function updatePrice() {
+            // Generate a random change between -0.02 and +0.02 (i.e., 1 cent to 2 dollars)
+            let change = (Math.random() * 0.02 * (Math.random() < 0.5 ? -1 : 1)).toFixed(2);
+            price = parseFloat(price) + parseFloat(change);
+            
+            // Ensure the price doesn't drop below 0 or exceed a reasonable range
+            price = Math.max(0.01, price).toFixed(2);
+            
+            // Update the price on the page
+            document.getElementById("price").innerText = price;
+        }
+
+        // Update the price every 60 seconds (60000 milliseconds)
+        setInterval(updatePrice, 60000);
+
+        // Initially display the price on page load
+        document.getElementById("price").innerText = price.toFixed(2);
+    </script>
+
+</body>
+</html>
