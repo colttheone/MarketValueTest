@@ -4,47 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Price Fluctuation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
-        }
-        .container {
-            text-align: center;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 300px;
-        }
-        h1 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-        .price-container {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #27ae60;
-            margin: 20px 0;
-            border: 2px solid #27ae60;
-            padding: 10px;
-            border-radius: 8px;
-            background: #eafaf1;
-        }
-        .timestamp {
-            font-size: 1em;
-            color: #777;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <div class="container">
         <h1>Price Fluctuation Test</h1>
         <div class="price-container">
@@ -54,33 +16,8 @@
             Last Updated: <span id="last-updated">Now</span>
         </div>
     </div>
-
-    <script>
-        let price = 1.00; // Initial price
-
-        function updatePrice() {
-            // Generate a random change between -0.01 and +0.01 (i.e., 1 cent to 1 cent)
-            let change = (Math.random() * 0.02 * (Math.random() < 0.5 ? -1 : 1)).toFixed(2);
-            price = parseFloat(price) + parseFloat(change);
-            
-            // Ensure the price doesn't drop below 0 or exceed a reasonable range
-            price = Math.max(0.01, price).toFixed(2);
-            
-            // Update the price on the page
-            document.getElementById("price").innerText = price;
-            
-            // Update the timestamp
-            let now = new Date().toLocaleTimeString();
-            document.getElementById("last-updated").innerText = now;
-        }
-
-        // Update the price every second (1000 milliseconds)
-        setInterval(updatePrice, 1000);
-
-        // Initially display the price and timestamp on page load
-        updatePrice();
-    </script>
-
+    <script src="price.js"></script>
 </body>
 </html>
+
 
