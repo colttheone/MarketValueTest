@@ -8,10 +8,11 @@ const tokenBalanceDisplay = document.getElementById('tokenBalance');
 const virtualBalanceDisplay = document.getElementById('virtualBalance');
 const buyButton = document.getElementById('buyToken');
 const sellButton = document.getElementById('sellToken');
+const itemButtons = document.querySelectorAll('.buyItem');
 
-// Function to simulate price change every second
+// Function to simulate price change every 500 milliseconds
 function updatePrice() {
-    let priceChange = (Math.random() - 0.5) * 0.02; // Random price change between -0.01 and +0.01
+    let priceChange = (Math.random() - 0.5) * 0.04; // Random price change between -0.02 and +0.02
     tokenPrice = Math.max(0.01, tokenPrice + priceChange); // Ensure price never drops below $0.01
     priceDisplay.innerText = tokenPrice.toFixed(2);
 }
@@ -37,5 +38,19 @@ sellButton.addEventListener('click', function() {
     }
 });
 
-// Update the token price every second
-setInterval(updatePrice, 1000);
+// Handle item purchases in the marketplace
+itemButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const itemPrice = parseFloat(this.getAttribute('data-price'));
+        if (virtualDollars >= itemPrice) {
+            virtualDollars -= itemPrice;
+            virtualBalanceDisplay.innerText = virtualDollars.toFixed(2);
+            alert('You bought this item!');
+        } else {
+            alert('Not enough virtual dollars!');
+        }
+    });
+});
+
+// Update the token price every 500 milliseconds
+setInterval(updatePrice, 500);
