@@ -3,99 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Token Price</title>
+    <title>Virtual Token Marketplace</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f9;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
         }
         .container {
-            text-align: center;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
             padding: 20px;
-            width: 90%;
-            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
         }
-        button, input {
-            padding: 10px;
-            font-size: 1em;
-            margin: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .token-price, .balance, .virtual-dollars {
+            font-size: 24px;
+            margin: 20px 0;
         }
         button {
-            background-color: #4caf50;
-            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
             cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
         }
-        .ledger {
-            margin-top: 20px;
-            text-align: left;
-            max-height: 200px;
-            overflow-y: auto;
+        button:disabled {
+            background-color: #ccc;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Dynamic Token Price</h1>
-        <p id="price">Loading...</p>
-        <input type="number" id="amount" placeholder="Enter amount">
-        <button onclick="buyToken()">Buy Token</button>
-        <button onclick="sellToken()">Sell Token</button>
-        <div class="ledger" id="ledger">
-            <h2>Transaction Ledger</h2>
-        </div>
+        <h1>Virtual Token Marketplace</h1>
+        <div class="token-price">Token Price: $<span id="price">1.00</span></div>
+        <div class="balance">Your Tokens: <span id="tokenBalance">0</span></div>
+        <div class="virtual-dollars">Your Virtual Dollars: $<span id="virtualBalance">0.00</span></div>
+        
+        <button id="buyToken">Buy Token ($1 real money)</button>
+        <button id="sellToken" disabled>Sell Token</button>
     </div>
-    <script>
-        let price = 0.01; // Initial price in dollars (1 cent)
-        const priceElement = document.getElementById('price');
-        const ledgerElement = document.getElementById('ledger');
-        const transactions = [];
 
-        // Function to update the token price randomly
-        function updatePrice() {
-            const change = (Math.random() * 0.02 - 0.01).toFixed(5); // Change price by +/- up to 1 cent
-            price = Math.max(0.01, price + parseFloat(change)); // Ensure price doesn't go below 0.01
-            priceElement.innerText = `$${price.toFixed(5)}`;
-        }
-
-        function buyToken() {
-            const amount = parseFloat(document.getElementById('amount').value);
-            if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid amount.');
-                return;
-            }
-            const totalCost = price * amount;
-            const transaction = `Bought ${amount.toFixed(2)} tokens for $${totalCost.toFixed(5)} at $${price.toFixed(5)} each.`;
-            transactions.push(transaction);
-            updateLedger();
-        }
-
-        function sellToken() {
-            const amount = parseFloat(document.getElementById('amount').value);
-            if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid amount.');
-                return;
-            }
-            const totalRevenue = price * amount;
-            const transaction = `Sold ${amount.toFixed(2)} tokens for $${totalRevenue.toFixed(5)} at $${price.toFixed(5)} each.`;
-            transactions.push(transaction);
-            updateLedger();
-        }
-
-        function updateLedger() {
-            ledgerElement.innerHTML = `<h2>Transaction Ledger</h2>${transactions.map(t => `<p>${t}</p>`).join('')}`;
-        }
-
-        setInterval(updatePrice, 1000); // Update price every second
-    </script>
+    <script src="price.js"></script>
 </body>
 </html>
