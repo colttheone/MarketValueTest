@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Token Marketplace</title>
+    <title>Virtual Token and Item Marketplace</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,6 +35,21 @@
         button:disabled {
             background-color: #ccc;
         }
+        .marketplace {
+            margin-top: 30px;
+        }
+        .item {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: inline-block;
+            width: 150px;
+        }
+        .item-price {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -47,6 +62,25 @@
         
         <button id="buyToken">Buy Token ($1 real money)</button>
         <button id="sellToken" disabled>Sell Token</button>
+    </div>
+
+    <div class="marketplace">
+        <h2>Item Marketplace</h2>
+        <div class="item">
+            <p>Item 1</p>
+            <p class="item-price">$5 Virtual Dollars</p>
+            <button class="buyItem" data-price="5">Buy</button>
+        </div>
+        <div class="item">
+            <p>Item 2</p>
+            <p class="item-price">$10 Virtual Dollars</p>
+            <button class="buyItem" data-price="10">Buy</button>
+        </div>
+        <div class="item">
+            <p>Item 3</p>
+            <p class="item-price">$20 Virtual Dollars</p>
+            <button class="buyItem" data-price="20">Buy</button>
+        </div>
     </div>
 
     <script src="price.js"></script>
