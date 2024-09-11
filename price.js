@@ -1,97 +1,41 @@
-const PRICE_KEY = 'dynamicPrice';
-const UPDATE_INTERVAL = 1000; // 1 second
-const CHART_UPDATE_INTERVAL = 500; // Update chart every 0.5 seconds
+let tokenPrice = 1.00;  // Initial token price in real dollars
+let tokenBalance = 0;   // Number of tokens the user owns
+let virtualDollars = 0.00;  // Virtual dollars in the user's account
 
-let priceData = [];
-let timeData = [];
-let priceChart;
+// HTML elements
+const priceDisplay = document.getElementById('price');
+const tokenBalanceDisplay = document.getElementById('tokenBalance');
+const virtualBalanceDisplay = document.getElementById('virtualBalance');
+const buyButton = document.getElementById('buyToken');
+const sellButton = document.getElementById('sellToken');
 
-// Initialize Chart.js
-function initChart() {
-    const ctx = document.getElementById('priceChart').getContext('2d');
-    priceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: timeData,
-            datasets: [{
-                label: 'Price',
-                data: priceData,
-                borderColor: '#27ae60',
-                backgroundColor: 'rgba(39, 174, 96, 0.2)',
-                borderWidth: 2,
-                fill: true,
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'second'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Time'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Price ($)'
-                    }
-                }
-            },
-            elements: {
-                line: {
-                    tension: 0.1
-                }
-            }
-        }
-    });
-}
-
+// Function to simulate price change every second
 function updatePrice() {
-    let price = parseFloat(localStorage.getItem(PRICE_KEY)) || 1.00;
-    
-    // Generate a random change between -0.01 and +0.01
-    let change = (Math.random() * 0.02 * (Math.random() < 0.5 ? -1 : 1)).toFixed(2);
-    price = parseFloat(price) + parseFloat(change);
-    
-    // Ensure the price doesn't drop below 0
-    price = Math.max(0.01, price).toFixed(2);
-    
-    // Update localStorage with the new price
-    localStorage.setItem(PRICE_KEY, price);
-    
-    // Update the price on the page
-    document.getElementById("price").innerText = price;
-    
-    // Update the timestamp
-    let now = new Date().toLocaleTimeString();
-    document.getElementById("last-updated").innerText = now;
-    
-    // Update chart data
-    if (priceChart) {
-        let nowTime = new Date();
-        timeData.push(nowTime);
-        priceData.push(price);
-        
-        if (timeData.length > 30) {
-            timeData.shift();
-            priceData.shift();
+    let priceChange = (Math.random() - 0.5) * 0.02; // Random price change between -0.01 and +0.01
+    tokenPrice = Math.max(0.01, tokenPrice + priceChange); // Ensure price never drops below $0.01
+    priceDisplay.innerText = tokenPrice.toFixed(2);
+}
+
+// Buy token for real money (1 token = $1 real money)
+buyButton.addEventListener('click', function() {
+    tokenBalance++;
+    tokenBalanceDisplay.innerText = tokenBalance;
+    sellButton.disabled = false;  // Enable sell button when user has tokens
+});
+
+// Sell token for virtual dollars at current price
+sellButton.addEventListener('click', function() {
+    if (tokenBalance > 0) {
+        virtualDollars += tokenPrice;  // Add token value in virtual dollars
+        tokenBalance--;  // Decrease user's token balance
+        tokenBalanceDisplay.innerText = tokenBalance;
+        virtualBalanceDisplay.innerText = virtualDollars.toFixed(2);
+
+        if (tokenBalance === 0) {
+            sellButton.disabled = true;  // Disable sell button if no tokens left
         }
-        
-        priceChart.data.labels = timeData;
-        priceChart.data.datasets[0].data = priceData;
-        priceChart.update();
     }
-}
+});
 
-// Initialize the chart on page load
-window.onload = function() {
-    initChart();
-    updatePrice(); // Initial update to set starting values
-
-    // Update the price and chart every second
-    setInterval(updatePrice, UPDATE_INTERVAL);
-}
+// Update the token price every second
+setInterval(updatePrice, 1000);
