@@ -31,9 +31,9 @@
         }
         canvas {
             margin-top: 20px;
+            border: 1px solid #ccc;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="price-container">
@@ -65,33 +65,33 @@
 
         const priceData = [];
         const tokenData = [];
-        const priceChartCtx = document.getElementById('priceChart').getContext('2d');
-        const tokenChartCtx = document.getElementById('tokenChart').getContext('2d');
+        const priceCanvas = document.getElementById('priceChart');
+        const tokenCanvas = document.getElementById('tokenChart');
 
-        const priceChart = new Chart(priceChartCtx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Price ($)',
-                    data: priceData,
-                    borderColor: 'green',
-                    fill: false
-                }]
-            }
-        });
+        const priceCtx = priceCanvas.getContext('2d');
+        const tokenCtx = tokenCanvas.getContext('2d');
 
-        const tokenChart = new Chart(tokenChartCtx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Tokens Minted',
-                    data: tokenData,
-                    backgroundColor: 'blue'
-                }]
-            }
-        });
+        function drawPriceChart() {
+            priceCtx.clearRect(0, 0, priceCanvas.width, priceCanvas.height);
+            priceCtx.beginPath();
+            priceCtx.moveTo(0, priceCanvas.height - priceData[0] * 100);
+            priceData.forEach((price, index) => {
+                priceCtx.lineTo(index * (priceCanvas.width / priceData.length), priceCanvas.height - price * 100);
+            });
+            priceCtx.strokeStyle = 'green';
+            priceCtx.stroke();
+        }
+
+        function drawTokenChart() {
+            tokenCtx.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
+            tokenCtx.beginPath();
+            tokenCtx.moveTo(0, tokenCanvas.height);
+            tokenData.forEach((tokens, index) => {
+                tokenCtx.lineTo(index * (tokenCanvas.width / tokenData.length), tokenCanvas.height - tokens * 10);
+            });
+            tokenCtx.strokeStyle = 'blue';
+            tokenCtx.stroke();
+        }
 
         function updateDateTime() {
             const now = new Date();
@@ -106,10 +106,7 @@
             // Update price display
             priceElement.textContent = `$${currentPrice}`;
             priceData.push(currentPrice);
-
-            // Update price chart
-            priceChart.data.labels.push(new Date().toLocaleTimeString());
-            priceChart.update();
+            drawPriceChart();
         }
 
         function mintTokens() {
@@ -129,10 +126,7 @@
             totalTokensElement.textContent = totalTokensPrinted;
 
             tokenData.push(tokensToMint);
-
-            // Update token chart
-            tokenChart.data.labels.push(new Date().toLocaleTimeString());
-            tokenChart.update();
+            drawTokenChart();
 
             document.getElementById('tokensToPrint').value = ''; // Clear input
         }
@@ -153,10 +147,8 @@
             // Reset chart data
             priceData.length = 0;
             tokenData.length = 0;
-            priceChart.data.labels.length = 0;
-            tokenChart.data.labels.length = 0;
-            priceChart.update();
-            tokenChart.update();
+            drawPriceChart();
+            drawTokenChart();
         }
 
         // Update the price every 100 milliseconds
