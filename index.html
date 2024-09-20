@@ -27,14 +27,11 @@
             font-size: 48px;
             color: #333;
         }
-        .price-up {
-            color: green;
-        }
-        .price-down {
-            color: red;
-        }
         .controls {
             margin: 20px;
+        }
+        button {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -44,24 +41,29 @@
         <p class="price" id="currencyPrice">$1.00</p>
         <p id="currentDateTime"></p>
         <p>Tokens in Circulation: <span id="tokenCount">1</span></p>
+        <p>Total Tokens Printed: <span id="totalTokensPrinted">1</span></p>
     </div>
 
     <div class="controls">
         <input type="number" id="tokensToPrint" placeholder="Enter tokens to print" min="1">
         <button onclick="mintTokens()">Mint Tokens</button>
+        <button onclick="resetSystem()">Reset System</button>
     </div>
 
     <script>
         let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
         let tokensInCirculation = parseInt(localStorage.getItem('tokenCount')) || 1;
+        let totalTokensPrinted = parseInt(localStorage.getItem('totalTokensPrinted')) || 1;
 
         const priceElement = document.getElementById('currencyPrice');
         const tokenCountElement = document.getElementById('tokenCount');
+        const totalTokensElement = document.getElementById('totalTokensPrinted');
         const dateTimeElement = document.getElementById('currentDateTime');
 
-        // Update the price display
+        // Update displays
         priceElement.textContent = `$${currentPrice.toFixed(2)}`;
         tokenCountElement.textContent = tokensInCirculation;
+        totalTokensElement.textContent = totalTokensPrinted;
 
         function updateDateTime() {
             const now = new Date();
@@ -90,16 +92,36 @@
             }
 
             tokensInCirculation += tokensToMint;
+            totalTokensPrinted += tokensToMint;
+
             localStorage.setItem('tokenCount', tokensInCirculation);
+            localStorage.setItem('totalTokensPrinted', totalTokensPrinted);
+
             tokenCountElement.textContent = tokensInCirculation;
+            totalTokensElement.textContent = totalTokensPrinted;
 
             updatePrice(tokensToMint);
             document.getElementById('tokensToPrint').value = ''; // Clear input
         }
 
-        // Update the price every second
+        function resetSystem() {
+            currentPrice = 1.00;
+            tokensInCirculation = 1;
+            totalTokensPrinted = 1;
+
+            localStorage.setItem('currencyPrice', currentPrice);
+            localStorage.setItem('tokenCount', tokensInCirculation);
+            localStorage.setItem('totalTokensPrinted', totalTokensPrinted);
+
+            priceElement.textContent = `$${currentPrice.toFixed(2)}`;
+            tokenCountElement.textContent = tokensInCirculation;
+            totalTokensElement.textContent = totalTokensPrinted;
+        }
+
+        // Update the time and date every second
         setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
+
 
