@@ -99,11 +99,9 @@
         }
 
         function updatePrice() {
-            // Random fluctuation between -0.02 and 0.02
             const fluctuation = (Math.random() * 0.04 - 0.02);
             currentPrice = Math.max(0.01, (currentPrice + fluctuation)).toFixed(2);
 
-            // Update price display
             priceElement.textContent = `$${currentPrice}`;
             priceData.push(currentPrice);
             drawPriceChart();
@@ -144,14 +142,13 @@
             tokenCountElement.textContent = tokensInCirculation;
             totalTokensElement.textContent = totalTokensPrinted;
 
-            // Reset chart data
             priceData.length = 0;
             tokenData.length = 0;
             drawPriceChart();
             drawTokenChart();
         }
 
-        // Update the price every 100 milliseconds
+        // Update the price every second
         setInterval(updatePrice, 100);
         // Update the time every second
         setInterval(updateDateTime, 1000);
