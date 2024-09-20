@@ -1,88 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Token and Item Marketplace</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-        }
-        .token-price, .balance, .virtual-dollars {
-            font-size: 24px;
-            margin: 20px 0;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin: 5px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
-        }
-        button:disabled {
-            background-color: #ccc;
-        }
-        .marketplace {
-            margin-top: 30px;
-        }
-        .item {
-            background-color: #fff;
-            padding: 15px;
-            margin: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            display: inline-block;
-            width: 150px;
-        }
-        .item-price {
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Coin Token System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+    h1 {
+      color: #333;
+    }
+    .token-count {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+    .price {
+      font-size: 1.2em;
+      color: #007BFF;
+    }
+    .mint-button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .mint-button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Virtual Token Marketplace</h1>
-        <div class="token-price">Token Price: $<span id="price">1.00</span></div>
-        <div class="balance">Your Tokens: <span id="tokenBalance">0</span></div>
-        <div class="virtual-dollars">Your Virtual Dollars: $<span id="virtualBalance">0.00</span></div>
-        
-        <button id="buyToken">Buy Token ($1 real money)</button>
-        <button id="sellToken" disabled>Sell Token</button>
-    </div>
+  <div class="container">
+    <h1>3D Coin Token System</h1>
+    <p class="token-count" id="token-count">Tokens Available: 150</p>
+    <p class="price">Price per Token: $5.00</p>
+    <button class="mint-button" id="mint-button" onclick="mintToken()">Mint Token</button>
+  </div>
 
-    <div class="marketplace">
-        <h2>Item Marketplace</h2>
-        <div class="item">
-            <p>Item 1</p>
-            <p class="item-price">$5 Virtual Dollars</p>
-            <button class="buyItem" data-price="5">Buy</button>
-        </div>
-        <div class="item">
-            <p>Item 2</p>
-            <p class="item-price">$10 Virtual Dollars</p>
-            <button class="buyItem" data-price="10">Buy</button>
-        </div>
-        <div class="item">
-            <p>Item 3</p>
-            <p class="item-price">$20 Virtual Dollars</p>
-            <button class="buyItem" data-price="20">Buy</button>
-        </div>
-    </div>
+  <script>
+    const monthlyLimit = 150;
+    let tokensLeft = monthlyLimit;
 
-    <script src="price.js"></script>
+    function updateTokenDisplay() {
+      document.getElementById('token-count').innerText = `Tokens Available: ${tokensLeft}`;
+      document.getElementById('mint-button').disabled = tokensLeft <= 0;
+    }
+
+    function mintToken() {
+      if (tokensLeft > 0) {
+        tokensLeft--;
+        updateTokenDisplay();
+      }
+    }
+
+    // Reset the tokens on the 1st of every month
+    const today = new Date();
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const timeUntilNextMonth = nextMonth - today;
+
+    setTimeout(() => {
+      tokensLeft = monthlyLimit;
+      updateTokenDisplay();
+    }, timeUntilNextMonth);
+
+    updateTokenDisplay();
+  </script>
+
 </body>
 </html>
