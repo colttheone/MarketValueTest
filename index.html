@@ -23,12 +23,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-        .controls {
-            margin: 20px;
-        }
-        button {
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
@@ -38,12 +32,8 @@
         <p id="currentDateTime"></p>
     </div>
 
-    <div class="controls">
-        <button onclick="updatePrice()">Update Price</button>
-    </div>
-
     <script>
-        let currentPrice = 1.00;
+        let currentPrice = 1.00; // Initialize the starting price
 
         const priceElement = document.getElementById('currencyPrice');
         const dateTimeElement = document.getElementById('currentDateTime');
@@ -54,16 +44,16 @@
         }
 
         function updatePrice() {
-            const fluctuation = (Math.random() * 0.1 - 0.05); // Random fluctuation between -0.05 and 0.05
-            currentPrice = Math.max(0.01, (currentPrice + fluctuation)).toFixed(2);
-            priceElement.textContent = `$${currentPrice}`;
+            // Random fluctuation between -0.02 and 0.02
+            const fluctuation = (Math.random() * 0.04 - 0.02); 
+            currentPrice = Math.max(0.01, (currentPrice + fluctuation)); // Ensure price doesn't go below 0.01
+            priceElement.textContent = `$${currentPrice.toFixed(2)}`; // Format to 2 decimal places
         }
 
-        // Update the price every second
-        setInterval(updatePrice, 1000);
+        // Update the price every 100 milliseconds
+        setInterval(updatePrice, 100);
         // Update the time every second
         setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
-
