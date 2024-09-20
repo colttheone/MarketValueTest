@@ -8,6 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -20,6 +21,7 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
         .price {
             font-size: 48px;
@@ -31,46 +33,72 @@
         .price-down {
             color: red;
         }
+        .controls {
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="price-container">
         <h1>Fake Currency Price</h1>
         <p class="price" id="currencyPrice">$1.00</p>
+        <p id="currentDateTime"></p>
+        <p>Tokens in Circulation: <span id="tokenCount">1</span></p>
+    </div>
+
+    <div class="controls">
+        <input type="number" id="tokensToPrint" placeholder="Enter tokens to print" min="1">
+        <button onclick="mintTokens()">Mint Tokens</button>
     </div>
 
     <script>
-        // Load the price from localStorage, or default to 1.00 if not found
         let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
+        let tokensInCirculation = parseInt(localStorage.getItem('tokenCount')) || 1;
 
-        // Update the price on the page load
         const priceElement = document.getElementById('currencyPrice');
+        const tokenCountElement = document.getElementById('tokenCount');
+        const dateTimeElement = document.getElementById('currentDateTime');
+
+        // Update the price display
         priceElement.textContent = `$${currentPrice.toFixed(2)}`;
+        tokenCountElement.textContent = tokensInCirculation;
 
-        function updatePrice() {
-            // Randomly increase or decrease the price
-            let change = (Math.random() * 0.05).toFixed(2); // Up to 5 cents
-            let direction = Math.random() < 0.5 ? -1 : 1;   // Choose up or down
-            currentPrice = parseFloat(currentPrice) + (direction * change);
-            currentPrice = Math.max(0.01, currentPrice).toFixed(2); // Prevent going below 0.01
-
-            // Save the current price to localStorage
-            localStorage.setItem('currencyPrice', currentPrice);
-
-            // Update the price in the UI
-            priceElement.textContent = `$${currentPrice}`;
-
-            // Change the color based on price movement
-            priceElement.classList.remove('price-up', 'price-down');
-            if (direction > 0) {
-                priceElement.classList.add('price-up');
-            } else {
-                priceElement.classList.add('price-down');
-            }
+        function updateDateTime() {
+            const now = new Date();
+            dateTimeElement.textContent = now.toLocaleString();
         }
 
-        // Keep updating the price every second
-        setInterval(updatePrice, 1000);
+        function updatePrice(increment) {
+            // Adjust price based on tokens printed
+            if (increment > 50) {
+                currentPrice -= 0.02; // Small downward trend
+            } else {
+                currentPrice += 0.02; // Small upward trend
+            }
+
+            // Ensure price doesn't drop below 0.01
+            currentPrice = Math.max(0.01, currentPrice).toFixed(2);
+            localStorage.setItem('currencyPrice', currentPrice);
+            priceElement.textContent = `$${currentPrice}`;
+        }
+
+        function mintTokens() {
+            const tokensToMint = parseInt(document.getElementById('tokensToPrint').value);
+            if (isNaN(tokensToMint) || tokensToMint <= 0) {
+                alert("Please enter a valid number of tokens.");
+                return;
+            }
+
+            tokensInCirculation += tokensToMint;
+            localStorage.setItem('tokenCount', tokensInCirculation);
+            tokenCountElement.textContent = tokensInCirculation;
+
+            updatePrice(tokensToMint);
+            document.getElementById('tokensToPrint').value = ''; // Clear input
+        }
+
+        // Update the price every second
+        setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
