@@ -26,27 +26,26 @@
     h1 {
       color: #333;
     }
-    .token-count {
-      font-size: 2em;
+    .input-field {
       margin: 20px 0;
     }
+    .input-field input {
+      width: 50px;
+      text-align: center;
+      font-size: 1.5em;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
     .price {
-      font-size: 1.2em;
+      font-size: 1.5em;
       color: #007BFF;
     }
-    .mint-button {
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 5px;
-      margin-top: 20px;
+    .price.up {
+      color: green;
     }
-    .mint-button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
+    .price.down {
+      color: red;
     }
   </style>
 </head>
@@ -54,38 +53,42 @@
 
   <div class="container">
     <h1>3D Coin Token System</h1>
-    <p class="token-count" id="token-count">Tokens Available: 150</p>
-    <p class="price">Price per Token: $5.00</p>
-    <button class="mint-button" id="mint-button" onclick="mintToken()">Mint Token</button>
+    <div class="input-field">
+      <label for="token-input">Tokens Owned: </label>
+      <input type="number" id="token-input" min="0" value="0" oninput="updateTokens()">
+    </div>
+    <p class="price">Current Token Price: <span id="token-price">$5.00</span></p>
   </div>
 
   <script>
-    const monthlyLimit = 150;
-    let tokensLeft = monthlyLimit;
+    let tokensOwned = 0;
+    let pricePerToken = 5.00;
+    const priceElement = document.getElementById('token-price');
 
-    function updateTokenDisplay() {
-      document.getElementById('token-count').innerText = `Tokens Available: ${tokensLeft}`;
-      document.getElementById('mint-button').disabled = tokensLeft <= 0;
+    // Update the number of tokens owned
+    function updateTokens() {
+      tokensOwned = parseInt(document.getElementById('token-input').value) || 0;
     }
 
-    function mintToken() {
-      if (tokensLeft > 0) {
-        tokensLeft--;
-        updateTokenDisplay();
+    // Function to simulate price going up or down randomly
+    function fluctuatePrice() {
+      // Randomly choose either +0.01 or -0.01
+      const change = Math.random() < 0.5 ? 0.01 : -0.01;
+      pricePerToken += change;
+
+      // Ensure the price doesn't go below $0.01
+      if (pricePerToken < 0.01) {
+        pricePerToken = 0.01;
       }
+
+      // Update the price display and color based on movement
+      priceElement.innerText = `$${pricePerToken.toFixed(2)}`;
+      priceElement.classList.toggle('up', change > 0);
+      priceElement.classList.toggle('down', change < 0);
     }
 
-    // Reset the tokens on the 1st of every month
-    const today = new Date();
-    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const timeUntilNextMonth = nextMonth - today;
-
-    setTimeout(() => {
-      tokensLeft = monthlyLimit;
-      updateTokenDisplay();
-    }, timeUntilNextMonth);
-
-    updateTokenDisplay();
+    // Fluctuate the price every 100 milliseconds
+    setInterval(fluctuatePrice, 100);
   </script>
 
 </body>
