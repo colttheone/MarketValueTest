@@ -23,6 +23,10 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
+        canvas {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -32,11 +36,16 @@
         <p id="currentDateTime"></p>
     </div>
 
+    <canvas id="priceChart" width="400" height="200"></canvas>
+
     <script>
-        let currentPrice = 1.00; // Initialize the starting price
+        let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00; // Initialize price from localStorage
+        let priceData = JSON.parse(localStorage.getItem('priceData')) || []; // Initialize price data from localStorage
 
         const priceElement = document.getElementById('currencyPrice');
         const dateTimeElement = document.getElementById('currentDateTime');
+        const priceCanvas = document.getElementById('priceChart');
+        const priceCtx = priceCanvas.getContext('2d');
 
         function updateDateTime() {
             const now = new Date();
@@ -48,7 +57,30 @@
             const fluctuation = (Math.random() * 0.04 - 0.02); 
             currentPrice = Math.max(0.01, (currentPrice + fluctuation)); // Ensure price doesn't go below 0.01
             priceElement.textContent = `$${currentPrice.toFixed(2)}`; // Format to 2 decimal places
+            
+            // Store the price data
+            priceData.push(currentPrice);
+            localStorage.setItem('currencyPrice', currentPrice); // Save current price
+            localStorage.setItem('priceData', JSON.stringify(priceData)); // Save price data
+            drawPriceChart();
         }
+
+        function drawPriceChart() {
+            priceCtx.clearRect(0, 0, priceCanvas.width, priceCanvas.height);
+            priceCtx.beginPath();
+            if (priceData.length > 0) {
+                priceCtx.moveTo(0, priceCanvas.height - priceData[0] * 100); // Scale to fit canvas
+                priceData.forEach((price, index) => {
+                    priceCtx.lineTo(index * (priceCanvas.width / priceData.length), priceCanvas.height - price * 100);
+                });
+                priceCtx.strokeStyle = 'green';
+                priceCtx.stroke();
+            }
+        }
+
+        // Initialize the display
+        priceElement.textContent = `$${currentPrice.toFixed(2)}`;
+        drawPriceChart();
 
         // Update the price every 100 milliseconds
         setInterval(updatePrice, 100);
