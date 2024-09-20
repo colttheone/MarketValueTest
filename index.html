@@ -44,18 +44,20 @@
         function updatePrice() {
             // Randomly decide if the price goes up or down
             let change = (Math.random() * 0.05).toFixed(2); // Change up to 5 cents
-            let direction = Math.random() < 0.5 ? -1 : 1;
-            currentPrice = (currentPrice + direction * change).toFixed(2);
+            let direction = Math.random() < 0.5 ? -1 : 1;   // Randomly choose up or down
+            currentPrice = parseFloat(currentPrice) + (direction * change);
+            currentPrice = currentPrice.toFixed(2);
 
-            // Ensure price doesn't go negative
-            if (currentPrice < 0) {
+            // Ensure the price doesn't drop below 0.01
+            if (currentPrice < 0.01) {
                 currentPrice = 0.01;
             }
 
+            // Update the price in the UI
             const priceElement = document.getElementById('currencyPrice');
             priceElement.textContent = `$${currentPrice}`;
 
-            // Apply CSS class based on price movement
+            // Change the color of the price based on the movement
             priceElement.classList.remove('price-up', 'price-down');
             if (direction > 0) {
                 priceElement.classList.add('price-up');
@@ -64,8 +66,9 @@
             }
         }
 
-        // Update the price every second
+        // Keep updating the price every second
         setInterval(updatePrice, 1000);
     </script>
 </body>
 </html>
+
