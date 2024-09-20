@@ -29,10 +29,6 @@
         button {
             margin-top: 10px;
         }
-        canvas {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-        }
     </style>
 </head>
 <body>
@@ -40,58 +36,17 @@
         <h1>Fake Currency Price</h1>
         <p class="price" id="currencyPrice">$1.00</p>
         <p id="currentDateTime"></p>
-        <p>Tokens in Circulation: <span id="tokenCount">1</span></p>
-        <p>Total Tokens Printed: <span id="totalTokensPrinted">1</span></p>
     </div>
 
     <div class="controls">
-        <input type="number" id="tokensToPrint" placeholder="Enter tokens to print" min="1">
-        <button onclick="mintTokens()">Mint Tokens</button>
-        <button onclick="resetSystem()">Reset System</button>
+        <button onclick="updatePrice()">Update Price</button>
     </div>
 
-    <canvas id="priceChart" width="400" height="200"></canvas>
-    <canvas id="tokenChart" width="400" height="200"></canvas>
-
     <script>
-        let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
-        let tokensInCirculation = parseInt(localStorage.getItem('tokenCount')) || 1;
-        let totalTokensPrinted = parseInt(localStorage.getItem('totalTokensPrinted')) || 1;
+        let currentPrice = 1.00;
 
         const priceElement = document.getElementById('currencyPrice');
-        const tokenCountElement = document.getElementById('tokenCount');
-        const totalTokensElement = document.getElementById('totalTokensPrinted');
         const dateTimeElement = document.getElementById('currentDateTime');
-
-        const priceData = [];
-        const tokenData = [];
-        const priceCanvas = document.getElementById('priceChart');
-        const tokenCanvas = document.getElementById('tokenChart');
-
-        const priceCtx = priceCanvas.getContext('2d');
-        const tokenCtx = tokenCanvas.getContext('2d');
-
-        function drawPriceChart() {
-            priceCtx.clearRect(0, 0, priceCanvas.width, priceCanvas.height);
-            priceCtx.beginPath();
-            priceCtx.moveTo(0, priceCanvas.height - priceData[0] * 100);
-            priceData.forEach((price, index) => {
-                priceCtx.lineTo(index * (priceCanvas.width / priceData.length), priceCanvas.height - price * 100);
-            });
-            priceCtx.strokeStyle = 'green';
-            priceCtx.stroke();
-        }
-
-        function drawTokenChart() {
-            tokenCtx.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
-            tokenCtx.beginPath();
-            tokenCtx.moveTo(0, tokenCanvas.height);
-            tokenData.forEach((tokens, index) => {
-                tokenCtx.lineTo(index * (tokenCanvas.width / tokenData.length), tokenCanvas.height - tokens * 10);
-            });
-            tokenCtx.strokeStyle = 'blue';
-            tokenCtx.stroke();
-        }
 
         function updateDateTime() {
             const now = new Date();
@@ -99,59 +54,16 @@
         }
 
         function updatePrice() {
-            const fluctuation = (Math.random() * 0.04 - 0.02);
+            const fluctuation = (Math.random() * 0.1 - 0.05); // Random fluctuation between -0.05 and 0.05
             currentPrice = Math.max(0.01, (currentPrice + fluctuation)).toFixed(2);
-
             priceElement.textContent = `$${currentPrice}`;
-            priceData.push(currentPrice);
-            drawPriceChart();
-        }
-
-        function mintTokens() {
-            const tokensToMint = parseInt(document.getElementById('tokensToPrint').value);
-            if (isNaN(tokensToMint) || tokensToMint <= 0) {
-                alert("Please enter a valid number of tokens.");
-                return;
-            }
-
-            tokensInCirculation += tokensToMint;
-            totalTokensPrinted += tokensToMint;
-
-            localStorage.setItem('tokenCount', tokensInCirculation);
-            localStorage.setItem('totalTokensPrinted', totalTokensPrinted);
-
-            tokenCountElement.textContent = tokensInCirculation;
-            totalTokensElement.textContent = totalTokensPrinted;
-
-            tokenData.push(tokensToMint);
-            drawTokenChart();
-
-            document.getElementById('tokensToPrint').value = ''; // Clear input
-        }
-
-        function resetSystem() {
-            currentPrice = 1.00;
-            tokensInCirculation = 1;
-            totalTokensPrinted = 1;
-
-            localStorage.setItem('currencyPrice', currentPrice);
-            localStorage.setItem('tokenCount', tokensInCirculation);
-            localStorage.setItem('totalTokensPrinted', totalTokensPrinted);
-
-            priceElement.textContent = `$${currentPrice.toFixed(2)}`;
-            tokenCountElement.textContent = tokensInCirculation;
-            totalTokensElement.textContent = totalTokensPrinted;
-
-            priceData.length = 0;
-            tokenData.length = 0;
-            drawPriceChart();
-            drawTokenChart();
         }
 
         // Update the price every second
-        setInterval(updatePrice, 100);
+        setInterval(updatePrice, 1000);
         // Update the time every second
         setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
+
