@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fake Currency System</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,7 +44,7 @@
         <p id="currentDateTime"></p>
     </div>
 
-    <canvas id="priceChart"></canvas>
+    <canvas id="priceChart" width="400" height="200"></canvas>
 
     <div class="controls">
         <input type="number" id="coinsPrinted" placeholder="Enter coins printed this month" />
@@ -56,44 +55,12 @@
         let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
         let priceData = JSON.parse(localStorage.getItem('priceData')) || [];
         let timeData = JSON.parse(localStorage.getItem('timeData')) || [];
-        let coinsPrinted = 0; // Initialize printed coins
+        let coinsPrinted = 0;
 
         const priceElement = document.getElementById('currencyPrice');
         const dateTimeElement = document.getElementById('currentDateTime');
-        const ctx = document.getElementById('priceChart').getContext('2d');
-
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: timeData,
-                datasets: [{
-                    label: 'Price in USD',
-                    data: priceData,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 2,
-                    fill: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Price (USD)'
-                        },
-                        min: 0,
-                    }
-                }
-            }
-        });
+        const priceCanvas = document.getElementById('priceChart');
+        const priceCtx = priceCanvas.getContext('2d');
 
         function updateDateTime() {
             const now = new Date();
@@ -101,7 +68,6 @@
         }
 
         function updatePrice() {
-            // Random fluctuation based on coins printed
             let fluctuation = (Math.random() * 0.04 - 0.02);
             if (coinsPrinted > 50) {
                 fluctuation *= 0.5; // Reduce upward momentum if over 50 coins
@@ -109,7 +75,7 @@
             currentPrice = Math.max(0.01, (currentPrice + fluctuation));
             priceElement.textContent = `$${currentPrice.toFixed(2)}`;
             
-            // Store price and time data
+            // Store the price and time data
             const now = new Date().toLocaleTimeString();
             priceData.push(currentPrice);
             timeData.push(now);
@@ -117,9 +83,20 @@
             localStorage.setItem('priceData', JSON.stringify(priceData));
             localStorage.setItem('timeData', JSON.stringify(timeData));
             
-            chart.data.labels = timeData;
-            chart.data.datasets[0].data = priceData;
-            chart.update();
+            drawPriceChart();
+        }
+
+        function drawPriceChart() {
+            priceCtx.clearRect(0, 0, priceCanvas.width, priceCanvas.height);
+            priceCtx.beginPath();
+            if (priceData.length > 0) {
+                priceCtx.moveTo(0, priceCanvas.height - priceData[0] * 100);
+                priceData.forEach((price, index) => {
+                    priceCtx.lineTo(index * (priceCanvas.width / priceData.length), priceCanvas.height - price * 100);
+                });
+                priceCtx.strokeStyle = 'green';
+                priceCtx.stroke();
+            }
         }
 
         function updateCoinsPrinted() {
@@ -129,9 +106,7 @@
 
         // Initialize the display
         priceElement.textContent = `$${currentPrice.toFixed(2)}`;
-        chart.data.labels = timeData;
-        chart.data.datasets[0].data = priceData;
-        chart.update();
+        drawPriceChart();
 
         // Update the price every 100 milliseconds
         setInterval(updatePrice, 100);
