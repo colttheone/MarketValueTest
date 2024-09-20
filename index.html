@@ -42,6 +42,7 @@
         <h1>Fake Currency Price</h1>
         <p class="price" id="currencyPrice">$1.00</p>
         <p id="currentDateTime"></p>
+        <p>Total Tokens Printed This Month: <span id="totalTokens">0</span></p>
     </div>
 
     <canvas id="priceChart" width="400" height="200"></canvas>
@@ -55,10 +56,12 @@
         let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
         let priceData = JSON.parse(localStorage.getItem('priceData')) || [];
         let timeData = JSON.parse(localStorage.getItem('timeData')) || [];
+        let totalTokensPrinted = parseInt(localStorage.getItem('totalTokensPrinted')) || 0; // Total tokens printed
         let coinsPrinted = 0;
 
         const priceElement = document.getElementById('currencyPrice');
         const dateTimeElement = document.getElementById('currentDateTime');
+        const totalTokensElement = document.getElementById('totalTokens');
         const priceCanvas = document.getElementById('priceChart');
         const priceCtx = priceCanvas.getContext('2d');
 
@@ -102,10 +105,16 @@
         function updateCoinsPrinted() {
             const input = document.getElementById('coinsPrinted').value;
             coinsPrinted = parseInt(input) || 0; // Update printed coins
+            totalTokensPrinted += coinsPrinted; // Add to total tokens
+            totalTokensElement.textContent = totalTokensPrinted; // Update total tokens display
+            
+            // Save total tokens to localStorage
+            localStorage.setItem('totalTokensPrinted', totalTokensPrinted);
         }
 
         // Initialize the display
         priceElement.textContent = `$${currentPrice.toFixed(2)}`;
+        totalTokensElement.textContent = totalTokensPrinted; // Display total tokens
         drawPriceChart();
 
         // Update the price every 100 milliseconds
