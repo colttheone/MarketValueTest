@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fake Currency System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,7 +26,15 @@
         }
         canvas {
             margin-top: 20px;
-            border: 1px solid #ccc;
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        input {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -36,16 +45,55 @@
         <p id="currentDateTime"></p>
     </div>
 
-    <canvas id="priceChart" width="400" height="200"></canvas>
+    <canvas id="priceChart"></canvas>
+
+    <div class="controls">
+        <input type="number" id="coinsPrinted" placeholder="Enter coins printed this month" />
+        <button onclick="updateCoinsPrinted()">Update Coins Printed</button>
+    </div>
 
     <script>
-        let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00; // Initialize price from localStorage
-        let priceData = JSON.parse(localStorage.getItem('priceData')) || []; // Initialize price data from localStorage
+        let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
+        let priceData = JSON.parse(localStorage.getItem('priceData')) || [];
+        let timeData = JSON.parse(localStorage.getItem('timeData')) || [];
+        let coinsPrinted = 0; // Initialize printed coins
 
         const priceElement = document.getElementById('currencyPrice');
         const dateTimeElement = document.getElementById('currentDateTime');
-        const priceCanvas = document.getElementById('priceChart');
-        const priceCtx = priceCanvas.getContext('2d');
+        const ctx = document.getElementById('priceChart').getContext('2d');
+
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timeData,
+                datasets: [{
+                    label: 'Price in USD',
+                    data: priceData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price (USD)'
+                        },
+                        min: 0,
+                    }
+                }
+            }
+        });
 
         function updateDateTime() {
             const now = new Date();
@@ -53,34 +101,37 @@
         }
 
         function updatePrice() {
-            // Random fluctuation between -0.02 and 0.02
-            const fluctuation = (Math.random() * 0.04 - 0.02); 
-            currentPrice = Math.max(0.01, (currentPrice + fluctuation)); // Ensure price doesn't go below 0.01
-            priceElement.textContent = `$${currentPrice.toFixed(2)}`; // Format to 2 decimal places
+            // Random fluctuation based on coins printed
+            let fluctuation = (Math.random() * 0.04 - 0.02);
+            if (coinsPrinted > 50) {
+                fluctuation *= 0.5; // Reduce upward momentum if over 50 coins
+            }
+            currentPrice = Math.max(0.01, (currentPrice + fluctuation));
+            priceElement.textContent = `$${currentPrice.toFixed(2)}`;
             
-            // Store the price data
+            // Store price and time data
+            const now = new Date().toLocaleTimeString();
             priceData.push(currentPrice);
-            localStorage.setItem('currencyPrice', currentPrice); // Save current price
-            localStorage.setItem('priceData', JSON.stringify(priceData)); // Save price data
-            drawPriceChart();
+            timeData.push(now);
+            localStorage.setItem('currencyPrice', currentPrice);
+            localStorage.setItem('priceData', JSON.stringify(priceData));
+            localStorage.setItem('timeData', JSON.stringify(timeData));
+            
+            chart.data.labels = timeData;
+            chart.data.datasets[0].data = priceData;
+            chart.update();
         }
 
-        function drawPriceChart() {
-            priceCtx.clearRect(0, 0, priceCanvas.width, priceCanvas.height);
-            priceCtx.beginPath();
-            if (priceData.length > 0) {
-                priceCtx.moveTo(0, priceCanvas.height - priceData[0] * 100); // Scale to fit canvas
-                priceData.forEach((price, index) => {
-                    priceCtx.lineTo(index * (priceCanvas.width / priceData.length), priceCanvas.height - price * 100);
-                });
-                priceCtx.strokeStyle = 'green';
-                priceCtx.stroke();
-            }
+        function updateCoinsPrinted() {
+            const input = document.getElementById('coinsPrinted').value;
+            coinsPrinted = parseInt(input) || 0; // Update printed coins
         }
 
         // Initialize the display
         priceElement.textContent = `$${currentPrice.toFixed(2)}`;
-        drawPriceChart();
+        chart.data.labels = timeData;
+        chart.data.datasets[0].data = priceData;
+        chart.update();
 
         // Update the price every 100 milliseconds
         setInterval(updatePrice, 100);
