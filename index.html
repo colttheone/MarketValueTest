@@ -40,7 +40,12 @@
     </div>
 
     <script>
-        let currentPrice = 1.00;
+        // Load the price from localStorage, or default to 1.00 if not found
+        let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
+
+        // Update the price on the page load
+        const priceElement = document.getElementById('currencyPrice');
+        priceElement.textContent = `$${currentPrice.toFixed(2)}`;
 
         function updatePrice() {
             // Randomly increase or decrease the price
@@ -49,8 +54,10 @@
             currentPrice = parseFloat(currentPrice) + (direction * change);
             currentPrice = Math.max(0.01, currentPrice).toFixed(2); // Prevent going below 0.01
 
+            // Save the current price to localStorage
+            localStorage.setItem('currencyPrice', currentPrice);
+
             // Update the price in the UI
-            const priceElement = document.getElementById('currencyPrice');
             priceElement.textContent = `$${currentPrice}`;
 
             // Change the color based on price movement
