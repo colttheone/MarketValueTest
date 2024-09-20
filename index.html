@@ -11,6 +11,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
             background-color: #f0f0f0;
         }
         .price-container {
@@ -42,22 +43,17 @@
         let currentPrice = 1.00;
 
         function updatePrice() {
-            // Randomly decide if the price goes up or down
-            let change = (Math.random() * 0.05).toFixed(2); // Change up to 5 cents
-            let direction = Math.random() < 0.5 ? -1 : 1;   // Randomly choose up or down
+            // Randomly increase or decrease the price
+            let change = (Math.random() * 0.05).toFixed(2); // Up to 5 cents
+            let direction = Math.random() < 0.5 ? -1 : 1;   // Choose up or down
             currentPrice = parseFloat(currentPrice) + (direction * change);
-            currentPrice = currentPrice.toFixed(2);
-
-            // Ensure the price doesn't drop below 0.01
-            if (currentPrice < 0.01) {
-                currentPrice = 0.01;
-            }
+            currentPrice = Math.max(0.01, currentPrice).toFixed(2); // Prevent going below 0.01
 
             // Update the price in the UI
             const priceElement = document.getElementById('currencyPrice');
             priceElement.textContent = `$${currentPrice}`;
 
-            // Change the color of the price based on the movement
+            // Change the color based on price movement
             priceElement.classList.remove('price-up', 'price-down');
             if (direction > 0) {
                 priceElement.classList.add('price-up');
@@ -71,4 +67,3 @@
     </script>
 </body>
 </html>
-
