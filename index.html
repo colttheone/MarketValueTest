@@ -23,17 +23,17 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-        .price {
-            font-size: 48px;
-            color: #333;
-        }
         .controls {
             margin: 20px;
         }
         button {
             margin-top: 10px;
         }
+        canvas {
+            margin-top: 20px;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="price-container">
@@ -50,6 +50,9 @@
         <button onclick="resetSystem()">Reset System</button>
     </div>
 
+    <canvas id="priceChart" width="400" height="200"></canvas>
+    <canvas id="tokenChart" width="400" height="200"></canvas>
+
     <script>
         let currentPrice = parseFloat(localStorage.getItem('currencyPrice')) || 1.00;
         let tokensInCirculation = parseInt(localStorage.getItem('tokenCount')) || 1;
@@ -60,28 +63,53 @@
         const totalTokensElement = document.getElementById('totalTokensPrinted');
         const dateTimeElement = document.getElementById('currentDateTime');
 
-        // Update displays
-        priceElement.textContent = `$${currentPrice.toFixed(2)}`;
-        tokenCountElement.textContent = tokensInCirculation;
-        totalTokensElement.textContent = totalTokensPrinted;
+        const priceData = [];
+        const tokenData = [];
+        const priceChartCtx = document.getElementById('priceChart').getContext('2d');
+        const tokenChartCtx = document.getElementById('tokenChart').getContext('2d');
+
+        const priceChart = new Chart(priceChartCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Price ($)',
+                    data: priceData,
+                    borderColor: 'green',
+                    fill: false
+                }]
+            }
+        });
+
+        const tokenChart = new Chart(tokenChartCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Tokens Minted',
+                    data: tokenData,
+                    backgroundColor: 'blue'
+                }]
+            }
+        });
 
         function updateDateTime() {
             const now = new Date();
             dateTimeElement.textContent = now.toLocaleString();
         }
 
-        function updatePrice(increment) {
-            // Adjust price based on tokens printed
-            if (increment > 50) {
-                currentPrice -= 0.02; // Small downward trend
-            } else {
-                currentPrice += 0.02; // Small upward trend
-            }
+        function updatePrice() {
+            // Random fluctuation between -0.02 and 0.02
+            const fluctuation = (Math.random() * 0.04 - 0.02);
+            currentPrice = Math.max(0.01, (currentPrice + fluctuation)).toFixed(2);
 
-            // Ensure price doesn't drop below 0.01
-            currentPrice = Math.max(0.01, currentPrice).toFixed(2);
-            localStorage.setItem('currencyPrice', currentPrice);
+            // Update price display
             priceElement.textContent = `$${currentPrice}`;
+            priceData.push(currentPrice);
+
+            // Update price chart
+            priceChart.data.labels.push(new Date().toLocaleTimeString());
+            priceChart.update();
         }
 
         function mintTokens() {
@@ -100,7 +128,12 @@
             tokenCountElement.textContent = tokensInCirculation;
             totalTokensElement.textContent = totalTokensPrinted;
 
-            updatePrice(tokensToMint);
+            tokenData.push(tokensToMint);
+
+            // Update token chart
+            tokenChart.data.labels.push(new Date().toLocaleTimeString());
+            tokenChart.update();
+
             document.getElementById('tokensToPrint').value = ''; // Clear input
         }
 
@@ -116,12 +149,20 @@
             priceElement.textContent = `$${currentPrice.toFixed(2)}`;
             tokenCountElement.textContent = tokensInCirculation;
             totalTokensElement.textContent = totalTokensPrinted;
+
+            // Reset chart data
+            priceData.length = 0;
+            tokenData.length = 0;
+            priceChart.data.labels.length = 0;
+            tokenChart.data.labels.length = 0;
+            priceChart.update();
+            tokenChart.update();
         }
 
-        // Update the time and date every second
+        // Update the price every 100 milliseconds
+        setInterval(updatePrice, 100);
+        // Update the time every second
         setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
-
-
