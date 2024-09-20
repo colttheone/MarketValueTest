@@ -1,116 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Coin Token System</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #e0e0e0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      background-color: #fff;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      width: 320px;
-      text-align: center;
-    }
-    h1 {
-      color: #333;
-      font-size: 1.8em;
-      margin-bottom: 10px;
-    }
-    .input-field {
-      margin-bottom: 20px;
-    }
-    .input-field input {
-      width: 80px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1.4em;
-      text-align: center;
-    }
-    .price-container {
-      margin-top: 20px;
-    }
-    .price {
-      font-size: 1.8em;
-      font-weight: bold;
-      padding: 10px;
-      color: #007bff;
-      transition: color 0.3s;
-    }
-    .price.up {
-      color: #28a745;
-    }
-    .price.down {
-      color: #dc3545;
-    }
-    .footer {
-      margin-top: 20px;
-      font-size: 0.9em;
-      color: #888;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Currency System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .price-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .price {
+            font-size: 48px;
+            color: #333;
+        }
+        .price-up {
+            color: green;
+        }
+        .price-down {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-
-  <div class="container">
-    <h1>3D Coin Token</h1>
-    <div class="input-field">
-      <label for="token-input">Tokens Owned</label><br>
-      <input type="number" id="token-input" min="0" value="0" oninput="updateTokens()">
-    </div>
     <div class="price-container">
-      <span>Current Token Price:</span>
-      <p class="price" id="token-price">$5.00</p>
+        <h1>Fake Currency Price</h1>
+        <p class="price" id="currencyPrice">$1.00</p>
     </div>
-    <div class="footer">
-      Price fluctuates every 100 milliseconds
-    </div>
-  </div>
 
-  <script>
-    let tokensOwned = 0;
-    let pricePerToken = 5.00;
-    const priceElement = document.getElementById('token-price');
+    <script>
+        let currentPrice = 1.00;
 
-    // Update tokens owned (can add future functionality with this)
-    function updateTokens() {
-      tokensOwned = parseInt(document.getElementById('token-input').value) || 0;
-    }
+        function updatePrice() {
+            // Randomly decide if the price goes up or down
+            let change = (Math.random() * 0.05).toFixed(2); // Change up to 5 cents
+            let direction = Math.random() < 0.5 ? -1 : 1;
+            currentPrice = (currentPrice + direction * change).toFixed(2);
 
-    // Function to fluctuate the price up or down randomly
-    function fluctuatePrice() {
-      const change = Math.random() < 0.5 ? 0.01 : -0.01;  // Random up or down
-      pricePerToken += change;
+            // Ensure price doesn't go negative
+            if (currentPrice < 0) {
+                currentPrice = 0.01;
+            }
 
-      // Ensure price doesn't drop below $0.01
-      if (pricePerToken < 0.01) {
-        pricePerToken = 0.01;
-      }
+            const priceElement = document.getElementById('currencyPrice');
+            priceElement.textContent = `$${currentPrice}`;
 
-      // Update the price display and apply color change for direction
-      priceElement.innerText = `$${pricePerToken.toFixed(2)}`;
-      priceElement.classList.toggle('up', change > 0);
-      priceElement.classList.toggle('down', change < 0);
-    }
+            // Apply CSS class based on price movement
+            priceElement.classList.remove('price-up', 'price-down');
+            if (direction > 0) {
+                priceElement.classList.add('price-up');
+            } else {
+                priceElement.classList.add('price-down');
+            }
+        }
 
-    // Fluctuate price every 100 milliseconds
-    setInterval(fluctuatePrice, 100);
-  </script>
-
+        // Update the price every second
+        setInterval(updatePrice, 1000);
+    </script>
 </body>
 </html>
